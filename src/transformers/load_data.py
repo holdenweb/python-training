@@ -5,7 +5,7 @@ from mongoengine import DecimalField
 from mongoengine import DynamicDocument
 from mongoengine import StringField
 from team import clean_int
-from team import load_data_rows
+from sheets import load_data_rows
 
 
 def as_dict(md):
@@ -81,12 +81,13 @@ def show_field(name, this, other):
         return f"{name}: {this[name]} -> {other[name]}"
 
 
+MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
+
+
 if __name__ == "__main__":
     """
     Load some sample data.
     """
-
-    MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
     class PeriodData(DynamicDocument):
         period = StringField()
