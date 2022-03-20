@@ -166,9 +166,9 @@ if __name__ == "__main__":
                 #
                 unchanged += 1
         else:  # We ran out of currents: any remaning incomings are new
-            PeriodData(**incoming).save()
+            incoming.save()
             new += 1
             for incoming in incoming_stream:
                 new += 1
-                PeriodData(**incoming).save()
+                incoming.save()
     print(f"Team load: new: {new}, unchanged: {unchanged}, changes: {edits}")
