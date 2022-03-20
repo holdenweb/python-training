@@ -1,0 +1,11 @@
+credentials.json
+token.json
+token.pickle
+venv/
+build/
+dist/
+*.wp?
+__pycache__
+.ipynb_checkpoints
+XX*
+stash
