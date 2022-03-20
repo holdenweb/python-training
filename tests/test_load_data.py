@@ -12,9 +12,10 @@ def test_spreadsheet_load():
     """
 
     """
-    data = load_data_rows(
+    data_rows = load_data_rows(
         sheet_id='1yFZLLz2Juln2s5nz26HcEPXOMMNbubeyPophqOIStFI',
-        range_spec='data!A8:C19',
+        range_spec='data!A7:C19',
         item_type=PeriodData
     )
-
+    pd = next(data_rows)
+    assert set(pd._data.keys()) == {'id', 'period', 'total_pay', 'regular_pay'}
