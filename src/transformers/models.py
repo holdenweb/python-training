@@ -24,3 +24,5 @@ class PeriodData(DynamicDocument):
             period=period, regular_pay=d["regular_pay"], total_pay=d["total_pay"]
         )
 
+    def __repr__(self):
+        return f"{MONTHS[int(self.period[4:])-1]} {self.period[4:]} {self.total_pay=}"
