@@ -1,12 +1,11 @@
 import os
 import pickle
 import sys
-
 from decimal import Decimal
+
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-
 from hu import ObjectDict as OD
 
 TOKEN_FILE = "token.pickle"
@@ -19,6 +18,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/documents",
     "https://www.googleapis.com/auth/spreadsheets.readonly",
 ]
+MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
 DEBUG_FEATURE_FLAGS = {"parse"}
 
@@ -87,20 +87,6 @@ def clean_percentage(tm, slot):
         if tm[slot][-1] != "%":
             raise ValueError(f"Row for '{tm.name}' has invalid percentage for {slot}")
         tm[slot] = Decimal(tm[slot][:-1]) / Decimal(100).quantize(Decimal("0.01"))
-
-
-def clean_data_row(tm):
-    """
-    Fix up the fields from raw to structured form.
-
-    This should be refactored to be a part of whatever plugin or
-    class goes with the data source. With luck there'll be a
-    barrage of data cleaning methods that can be easily deloyed.
-    """
-    p = tm["period"]
-    tm["period"] = f"{p[-2:]}{months.index(p[:3])+1:02d}"
-    tm["total_pay"] = Decimal(tm["total_pay"]).quantize(Decimal(".01"))
-    tm["regular_pay"] = Decimal(tm["regular_pay"]).quantize(Decimal(".01"))
 
 
 def clean_column_name(name):

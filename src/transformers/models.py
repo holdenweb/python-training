@@ -1,6 +1,9 @@
-from mongoengine import DynamicDocument, StringField, DecimalField
+from mongoengine import DecimalField
+from mongoengine import DynamicDocument
+from mongoengine import StringField
 
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
+
 
 class PeriodData(DynamicDocument):
     period = StringField()
@@ -19,10 +22,8 @@ class PeriodData(DynamicDocument):
         Ideally here we'd go through pydantic for validation,
         but at present I'm focusing on the haoppy paths..
         """
-        period = cls.clean_period(d["period"])
-        return cls(
-            period=period, regular_pay=d["regular_pay"], total_pay=d["total_pay"]
-        )
+        d["period"] = cls.clean_period(d["period"])
+        return cls(**d)
 
     def __repr__(self):
-        return f"{MONTHS[int(self.period[4:])-1]} {self.period[4:]} {self.total_pay=}"
+        return f"{MONTHS[int(self.period[-2:])-1]} {self.period[:2]}, total_pay={self.total_pay}, regular_pay={self.regular_pay}"

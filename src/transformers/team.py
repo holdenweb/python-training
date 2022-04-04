@@ -1,13 +1,10 @@
 import datetime
-from decimal import Decimal
 
-from hu import ObjectDict as OD
 from mongoengine import DateField
 from mongoengine import DecimalField
 from mongoengine import DynamicDocument
 from mongoengine import IntField
 from mongoengine import StringField
-from sheets import pull_data
 
 DECIMAL_FIELDS = {
     "fte",
@@ -48,7 +45,6 @@ class TeamMember(DynamicDocument):
     __str__ = __repr__
 
 
-
 months = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
 
@@ -75,12 +71,3 @@ def clean_date(tm, slot):
     else:
         d, m, y = tm[slot].replace("-", " ").split()
         tm[slot] = datetime.date(int(y) + 2000, months.index(m) + 1, int(d))
-
-
-
-
-if __name__ == "__main__":
-    data = load_data_rows(
-        sheet_id="1yoxaa2k8Sed1DpnQAS05Of22QxGg4hf7CAiJcgr7BtQ", range_spec="Sheet 1"
-    )
-    print(data)

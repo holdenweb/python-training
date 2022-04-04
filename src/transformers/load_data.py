@@ -4,8 +4,8 @@ from mongoengine import connect
 from mongoengine import DecimalField
 from mongoengine import DynamicDocument
 from mongoengine import StringField
-from team import clean_int
 from sheets import load_data_rows
+from team import clean_int
 
 
 def as_dict(md):
