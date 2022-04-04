@@ -1,25 +1,32 @@
 """
 test_mongo.py: discovery and learning around mongoengine.
 """
-import pytest
-from pytest import raises
-
 from decimal import Decimal
 
-from mongoengine import connect, disconnect, Document, DynamicDocument, DecimalField, StringField, ValidationError
-
+import pytest
+from mongoengine import connect
+from mongoengine import DecimalField
+from mongoengine import disconnect
+from mongoengine import Document
+from mongoengine import StringField
+from mongoengine import ValidationError
+from pytest import raises
 from sheets import clean_percentage
+
 
 class Doc1(Document):
     f1 = DecimalField(precision=2)
 
+
 class Doc2(Document):
     f1 = DecimalField(precision=2, required=True)
+
 
 class Doc3(Document):
     f1 = DecimalField(precision=2, null=True)
 
-@pytest.mark.parametrize(["doc"], [(Doc1, ), (Doc2, ), (Doc3, )])
+
+@pytest.mark.parametrize(["doc"], [(Doc1,), (Doc2,), (Doc3,)])
 def test_decimal(doc):
     """
     Test understanding of Decimal fields."""
@@ -32,12 +39,14 @@ def test_decimal(doc):
     assert len(list(doc.objects.all())) == 2
     disconnect()
 
+
 def save_null():
     connect(uuidRepresentation="pythonLegacy")
     Doc2.objects.delete()
     d2 = Doc2(f1=None)
     d2.save()
     disconnect()
+
 
 def test_required():
     "Test that None values don't actually get saved for required fields."
@@ -48,17 +57,17 @@ def test_required():
     assert raises(ValidationError, save_null)
     disconnect()
 
+
 zero = Decimal(0)
 
-@pytest.mark.parametrize(('value', 'result'),
-                         (("0%", zero),
-                          ("100%", Decimal("1"))))
+
+@pytest.mark.parametrize(("value", "result"), (("0%", zero), ("100%", Decimal("1"))))
 def test_clean_percentage(value, result):
     d1 = {"name": "d1", "x": value}
-    clean_percentage(d1, 'x')
+    clean_percentage(d1, "x")
+
 
 def test_record_manipulation():
-
     class ThreeFields(Document):
         f1 = DecimalField()
         f2 = DecimalField()
@@ -76,5 +85,6 @@ def test_record_manipulation():
     assert r1.f2 == Decimal("2.34")
     disconnect()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     test_required()
