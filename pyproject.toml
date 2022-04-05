@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "transformers"
-version = "0.1.0"
+version = "1.0a1"
 description = "Exercises in building useful data transformation utilities."
 authors = ["Department for International Trade"]
 license = "[provisionally] BSD"
@@ -14,6 +14,11 @@ google_api = "^0.1.12"
 requests = "^2.27.1"
 google-auth-oauthlib = "^0.5.1"
 google-api-python-client = "^2.41.0"
+uvicorn = "^0.17.6"
+WTForms = "^3.0.1"
+fastapi = "^0.75.1"
+multidict = "^6.0.2"
+python-multipart = "^0.0.5"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.1"
