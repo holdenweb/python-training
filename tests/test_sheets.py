@@ -1,6 +1,6 @@
 import json
 
-from sheets import build_service
+from transformers.sheets import build_service
 
 
 def test_service():

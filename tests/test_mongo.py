@@ -11,7 +11,7 @@ from mongoengine import Document
 from mongoengine import StringField
 from mongoengine import ValidationError
 from pytest import raises
-from sheets import clean_percentage
+from transformers.sheets import clean_percentage
 
 
 class Doc1(Document):

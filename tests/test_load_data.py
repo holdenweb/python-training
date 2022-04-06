@@ -5,8 +5,8 @@ tests increase confidence in integrity sufficiently that integration
 testing is only required in CI, where it doesn't slow developers
 down too much.
 """
-from models import PeriodData
-from sheets import load_data_rows
+from transformers.models import PeriodData
+from transformers.sheets import load_data_rows
 
 
 def test_spreadsheet_load():

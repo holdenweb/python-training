@@ -1,4 +1,4 @@
-from models import PeriodData
+from transformers.models import PeriodData
 
 
 def test_repr():
