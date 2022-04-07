@@ -16,8 +16,10 @@ architectural as well as coding matters.
 ## Getting Started
 
 You will need thge following dependencies installed:
-
 * A recent (3.7+) Python installation (currently developed on 3.9)
+
+* `Homebrew`:
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 * `poetry` - I recommend using the custom installer, see
   https://python-poetry.org/docs/.
@@ -30,10 +32,14 @@ You will need thge following dependencies installed:
   If mongodb hasn't been installed before you may need to first run:
   `brew tap mongodb/brew`
 
-  `brew install mongodb-community mongodb-database-tools mongosh` did the trick.
+  `brew install mongodb-community@5.0`
   `brew services start mongodb-community` ensures the server starts,
   and will thereafter start up on boot.
 
+Add credentials file to
+  ~/.credentials.json
+
+Authenticate with Google
 
 The following commands worked for me on my Mac.
 No other guarantees are offered.
