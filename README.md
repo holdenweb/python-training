@@ -35,6 +35,9 @@ You will need thge following dependencies installed:
   `brew install mongodb-community@5.0`
   `brew services start mongodb-community` ensures the server starts,
   and will thereafter start up on boot.
+    - alternatively, `mongod --config /opt/homebrew/etc/mongod.conf` to run interactively in a terminal (ctrl+c to quit).
+    - Note, your path may be different (may be `/usr/local/etc/mongod.conf` for Intel Macs).
+    - Remove the default `systemLog:` section from `mongod.conf` for logging to console.
 
 Add credentials file to
   ~/.credentials.json
