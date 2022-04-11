@@ -67,15 +67,15 @@ def pull_data(sheet_id, range):
         sheet_ranges = wb['data']
         return sheet_ranges.values
     else:
-    ss_service = build_service()
-    # Retrieve the spreadsheet's contents from the Sheets service.
-    document = (
-        ss_service.spreadsheets()
-        .values()
-        .get(spreadsheetId=sheet_id, range=range)
-        .execute()
-    )
-    return document
+        ss_service = build_service()
+        # Retrieve the spreadsheet's contents from the Sheets service.
+        document = (
+            ss_service.spreadsheets()
+            .values()
+            .get(spreadsheetId=sheet_id, range=range)
+            .execute()
+        )
+        return document
 
 
 def pull_props(sheet_id):
