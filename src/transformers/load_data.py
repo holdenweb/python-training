@@ -115,7 +115,7 @@ if __name__ == "__main__":
     The merge algorithm assumes stably ordered data.
     """
     incoming_stream = load_data_rows(
-        sheet_id="1yFZLLz2Juln2s5nz26HcEPXOMMNbubeyPophqOIStFI",
+        sheet_id="../../data/Average Weekly Earnings.xlsx",
         range_spec="data!A7:C272",
         item_type=PeriodData,
     )
