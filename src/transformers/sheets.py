@@ -122,7 +122,13 @@ def load_data_rows(sheet_id, range_spec, item_type):
     document method. Ideally most records will have enough semantic
     content (eventually) that a standard load method will suffice.
     """
-    raw_data_rows = pull_data(sheet_id, range_spec)["values"]
+    # Convert to a list of lists, since that's what the existing code mainly operates on.
+    raw_data_rows=[]
+    for name in pull_data(sheet_id, range_spec):
+        raw_data_rows.append(list(name))
+    # Drop fiest 6 rows
+    del raw_data_rows[0:6]
+
     col_names = [clean_column_name(name) for name in raw_data_rows[0]]
     n_cols = len(col_names)
     del raw_data_rows[0]
