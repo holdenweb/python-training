@@ -61,8 +61,13 @@ def build_service():
 
 
 def pull_data(sheet_id, range):
+    if os.path.splitext(sheet_id)[1] == '.xlsx':
+        # Excel format spreadsheet
+        wb = load_workbook(filename = sheet_id)
+        sheet_ranges = wb['data']
+        return sheet_ranges.values
+    else:
     ss_service = build_service()
-
     # Retrieve the spreadsheet's contents from the Sheets service.
     document = (
         ss_service.spreadsheets()
