@@ -5,13 +5,17 @@ from mongoengine import DecimalField
 from mongoengine import DynamicDocument
 from mongoengine import StringField
 from sheets import load_data_rows
-from team import clean_int
 
 
 def as_dict(md):
     result = json.loads(md.to_json())
     clean_int(result, "period")
     return result
+
+
+def clean_int(tm, slot):
+    val = tm[slot]
+    tm[slot] = int(val) if val else None
 
 
 def compare_docs(c: DynamicDocument, i: dict):
