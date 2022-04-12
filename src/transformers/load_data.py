@@ -1,11 +1,13 @@
 import json
+import csv
 
 from mongoengine import connect
 from mongoengine import DecimalField
 from mongoengine import DynamicDocument
 from mongoengine import StringField
-from sheets import load_data_rows
+
 from team import clean_int
+from sheets import clean_column_name
 
 
 def as_dict(md):
@@ -111,14 +113,23 @@ if __name__ == "__main__":
                 period=period, regular_pay=d["regular_pay"], total_pay=d["total_pay"]
             )
 
+    def load_data_rows(header_row_number, item_type):
+        with open('../../data/average_weekly_earnings.csv', newline='', encoding='utf-8-sig') as csvfile:
+            for i in range(header_row_number - 1):
+                next(csvfile, None)
+
+            reader = csv.DictReader(csvfile)
+            reader.fieldnames = [clean_column_name(name) for name in reader.fieldnames]
+
+            for row in reader:
+                if row["period"]:
+                    yield item_type.from_dict(row)
+
+
     """
     The merge algorithm assumes stably ordered data.
     """
-    incoming_stream = load_data_rows(
-        sheet_id="1yFZLLz2Juln2s5nz26HcEPXOMMNbubeyPophqOIStFI",
-        range_spec="data!A7:C272",
-        item_type=PeriodData,
-    )
+    incoming_stream = load_data_rows(header_row_number=7, item_type=PeriodData)
     incoming = next(incoming_stream)
 
     """
