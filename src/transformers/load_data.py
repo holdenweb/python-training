@@ -1,4 +1,5 @@
 import json
+import sys
 
 from mongoengine import connect
 from mongoengine import DecimalField
@@ -105,29 +106,22 @@ def show_field(name, this, other):
 
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
+def load_sheets_values(sheet_id, range_spec):
+    """
+    Read a worksheet range and update a mongodb document database.
 
-def main():
-    """
-    Load some sample data.
-    """
-
-    """
-    The merge algorithm assumes stably ordered data.
-    """
-    incoming_stream = load_data_rows(
-        sheet_id="1yFZLLz2Juln2s5nz26HcEPXOMMNbubeyPophqOIStFI",
-        range_spec="data!A7:C272",
-        item_type=PeriodData,
-    )
-    incoming = next(incoming_stream)
-
-    """
     We read the existing data in the same order as the incoming rows.
     When a key exists but is not present in the incoming stream there's
     a choice to be made (currently it's hardwired to assume the record
     is unchanged.) This means we can insert and update records, but not
     delete them.
     """
+    incoming_stream = load_data_rows(
+        sheet_id=sheet_id,
+        range_spec=range_spec,
+        item_type=PeriodData,
+    )
+    incoming = next(incoming_stream)
     with connect("WebDB"):
         new = edits = unchanged = 0
         current_stream = iter(PeriodData.objects.order_by("period"))
@@ -173,6 +167,18 @@ def main():
                 new += 1
                 incoming.save()
     print(f"Team load: new: {new}, unchanged: {unchanged}, changes: {edits}")
+
+def main(args):
+    """
+    Load some sample data.
+    """
+    specifier = args[1]
+    range_spec = args[2]
+    """
+    The merge algorithm assumes stably ordered data.
+    """
+    load_sheets_values(specifier, range_spec)
+
 
 if __name__ == "__main__":
     main(sys.argv)
