@@ -122,6 +122,8 @@ def load_sheets_values(sheet_id, range_spec):
         item_type=PeriodData,
     )
     incoming = next(incoming_stream)
+
+    # The merge algorithm assumes stably ordered data.
     with connect("WebDB"):
         new = edits = unchanged = 0
         current_stream = iter(PeriodData.objects.order_by("period"))
@@ -174,9 +176,6 @@ def main(args):
     """
     specifier = args[1]
     range_spec = args[2]
-    """
-    The merge algorithm assumes stably ordered data.
-    """
     load_sheets_values(specifier, range_spec)
 
 
