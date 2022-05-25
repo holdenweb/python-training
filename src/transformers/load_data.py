@@ -8,6 +8,28 @@ from sheets import load_data_rows
 from team import clean_int
 
 
+class PeriodData(DynamicDocument):
+    period = StringField()
+    total_pay = DecimalField()
+    regular_pay = DecimalField()
+
+    @classmethod
+    def clean_period(cls, s):
+        return f"{s[-2:]}{MONTHS.index(s[:3])+1:02d}"
+
+    @classmethod
+    def from_dict(cls, d):
+        """
+        Take input from a dictionary and return a PeriodData instance.
+
+        Ideally here we'd go through pydantic for validation,
+        but at present I'm focusing on the haoppy paths ...
+        """
+        period = cls.clean_period(d["period"])
+        return cls(
+            period=period, regular_pay=d["regular_pay"], total_pay=d["total_pay"]
+        )
+
 def as_dict(md):
     result = json.loads(md.to_json())
     clean_int(result, "period")
@@ -84,32 +106,10 @@ def show_field(name, this, other):
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
 
-if __name__ == "__main__":
+def main():
     """
     Load some sample data.
     """
-
-    class PeriodData(DynamicDocument):
-        period = StringField()
-        total_pay = DecimalField()
-        regular_pay = DecimalField()
-
-        @classmethod
-        def clean_period(cls, s):
-            return f"{s[-2:]}{MONTHS.index(s[:3])+1:02d}"
-
-        @classmethod
-        def from_dict(cls, d):
-            """
-            Take input from a citionary and return a PeriodData instance.
-
-            Ideally here we'd go through pydantic for validation,
-            but at present I'm focusing on the haoppy paths..
-            """
-            period = cls.clean_period(d["period"])
-            return cls(
-                period=period, regular_pay=d["regular_pay"], total_pay=d["total_pay"]
-            )
 
     """
     The merge algorithm assumes stably ordered data.
@@ -125,7 +125,7 @@ if __name__ == "__main__":
     We read the existing data in the same order as the incoming rows.
     When a key exists but is not present in the incoming stream there's
     a choice to be made (currently it's hardwired to assume the record
-    is unchanged.) This means we can inset and update records, but not
+    is unchanged.) This means we can insert and update records, but not
     delete them.
     """
     with connect("WebDB"):
@@ -173,3 +173,6 @@ if __name__ == "__main__":
                 new += 1
                 incoming.save()
     print(f"Team load: new: {new}, unchanged: {unchanged}, changes: {edits}")
+
+if __name__ == "__main__":
+    main(sys.argv)
