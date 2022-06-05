@@ -7,6 +7,7 @@ from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from hu import ObjectDict as OD
+from openpyxl import load_workbook
 
 TOKEN_FILE = "token.pickle"
 CREDENTIALS_FILE = os.environ.get(
@@ -60,16 +61,21 @@ def build_service():
 
 
 def pull_data(sheet_id, range):
-    ss_service = build_service()
-
-    # Retrieve the spreadsheet's contents from the Sheets service.
-    document = (
-        ss_service.spreadsheets()
-        .values()
-        .get(spreadsheetId=sheet_id, range=range)
-        .execute()
-    )
-    return document
+    if os.path.splitext(sheet_id)[1] == '.xlsx':
+        # Excel format spreadsheet
+        wb = load_workbook(filename = sheet_id)
+        sheet_ranges = wb['data']
+        return sheet_ranges.values
+    else:
+        ss_service = build_service()
+        # Retrieve the spreadsheet's contents from the Sheets service.
+        document = (
+            ss_service.spreadsheets()
+            .values()
+            .get(spreadsheetId=sheet_id, range=range)
+            .execute()
+        )
+        return document
 
 
 def pull_props(sheet_id):
@@ -116,7 +122,13 @@ def load_data_rows(sheet_id, range_spec, item_type):
     document method. Ideally most records will have enough semantic
     content (eventually) that a standard load method will suffice.
     """
-    raw_data_rows = pull_data(sheet_id, range_spec)["values"]
+    # Convert to a list of lists, since that's what the existing code mainly operates on.
+    raw_data_rows=[]
+    for name in pull_data(sheet_id, range_spec):
+        raw_data_rows.append(list(name))
+    # Drop fiest 6 rows
+    del raw_data_rows[0:6]
+
     col_names = [clean_column_name(name) for name in raw_data_rows[0]]
     n_cols = len(col_names)
     del raw_data_rows[0]
