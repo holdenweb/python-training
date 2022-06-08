@@ -1,4 +1,5 @@
 import json
+import sys
 
 from mongoengine import connect
 from mongoengine import DecimalField
@@ -6,6 +7,28 @@ from mongoengine import DynamicDocument
 from mongoengine import StringField
 from sheets import load_data_rows
 
+
+class PeriodData(DynamicDocument):
+    period = StringField()
+    total_pay = DecimalField()
+    regular_pay = DecimalField()
+
+    @classmethod
+    def clean_period(cls, s):
+        return f"{s[-2:]}{MONTHS.index(s[:3])+1:02d}"
+
+    @classmethod
+    def from_dict(cls, d):
+        """
+        Take input from a dictionary and return a PeriodData instance.
+
+        Ideally here we'd go through pydantic for validation,
+        but at present I'm focusing on the haoppy paths ...
+        """
+        period = cls.clean_period(d["period"])
+        return cls(
+            period=period, regular_pay=d["regular_pay"], total_pay=d["total_pay"]
+        )
 
 def as_dict(md):
     result = json.loads(md.to_json())
@@ -87,51 +110,24 @@ def show_field(name, this, other):
 
 MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split()
 
-
-if __name__ == "__main__":
+def load_sheets_values(sheet_id, range_spec):
     """
-    Load some sample data.
-    """
+    Read a worksheet range and update a mongodb document database.
 
-    class PeriodData(DynamicDocument):
-        period = StringField()
-        total_pay = DecimalField()
-        regular_pay = DecimalField()
-
-        @classmethod
-        def clean_period(cls, s):
-            return f"{s[-2:]}{MONTHS.index(s[:3])+1:02d}"
-
-        @classmethod
-        def from_dict(cls, d):
-            """
-            Take input from a citionary and return a PeriodData instance.
-
-            Ideally here we'd go through pydantic for validation,
-            but at present I'm focusing on the haoppy paths..
-            """
-            period = cls.clean_period(d["period"])
-            return cls(
-                period=period, regular_pay=d["regular_pay"], total_pay=d["total_pay"]
-            )
-
-    """
-    The merge algorithm assumes stably ordered data.
+    We read the existing data in the same order as the incoming rows.
+    When a key exists but is not present in the incoming stream there's
+    a choice to be made (currently it's hardwired to assume the record
+    is unchanged.) This means we can insert and update records, but not
+    delete them.
     """
     incoming_stream = load_data_rows(
-        sheet_id="1yFZLLz2Juln2s5nz26HcEPXOMMNbubeyPophqOIStFI",
-        range_spec="data!A7:C272",
+        sheet_id=sheet_id,
+        range_spec=range_spec,
         item_type=PeriodData,
     )
     incoming = next(incoming_stream)
 
-    """
-    We read the existing data in the same order as the incoming rows.
-    When a key exists but is not present in the incoming stream there's
-    a choice to be made (currently it's hardwired to assume the record
-    is unchanged.) This means we can inset and update records, but not
-    delete them.
-    """
+    # The merge algorithm assumes stably ordered data.
     with connect("WebDB"):
         new = edits = unchanged = 0
         current_stream = iter(PeriodData.objects.order_by("period"))
@@ -177,3 +173,15 @@ if __name__ == "__main__":
                 new += 1
                 incoming.save()
     print(f"Team load: new: {new}, unchanged: {unchanged}, changes: {edits}")
+
+def main(args):
+    """
+    Load some sample data.
+    """
+    specifier = args[1]
+    range_spec = args[2]
+    load_sheets_values(specifier, range_spec)
+
+
+if __name__ == "__main__":
+    main(sys.argv)
